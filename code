@@ -1,0 +1,67 @@
+from machine import Pin, PWM
+import time
+
+# BUZZER
+buzzer = PWM(Pin(27))
+buzzer.duty(0)
+
+# SENSOR
+sensor = Pin(15, Pin.IN)
+
+# STEPPER
+IN1 = Pin(5, Pin.OUT)
+IN2 = Pin(18, Pin.OUT)
+IN3 = Pin(19, Pin.OUT)
+IN4 = Pin(21, Pin.OUT)
+
+victory_tune = [523, 659, 784, 1046]
+
+while True:
+
+    if sensor.value() == 0:   # Ball detected
+
+        # -------- PLAY SOUND --------
+        buzzer.duty(512)
+
+        for note in victory_tune:
+            buzzer.freq(note)
+            time.sleep(0.2)
+
+        buzzer.freq(1046)
+        time.sleep(0.5)
+        buzzer.duty(0)
+
+        # -------- SPIN STEPPER --------
+        for i in range(200):   # Change 200 to spin more/less
+
+            IN1.value(1)
+            IN2.value(0)
+            IN3.value(0)
+            IN4.value(0)
+            time.sleep(0.005)
+
+            IN1.value(0)
+            IN2.value(1)
+            IN3.value(0)
+            IN4.value(0)
+            time.sleep(0.005)
+
+            IN1.value(0)
+            IN2.value(0)
+            IN3.value(1)
+            IN4.value(0)
+            time.sleep(0.005)
+
+            IN1.value(0)
+            IN2.value(0)
+            IN3.value(0)
+            IN4.value(1)
+            time.sleep(0.005)
+
+        # Turn motor OFF
+        IN1.value(0)
+        IN2.value(0)
+        IN3.value(0)
+        IN4.value(0)
+
+        time.sleep(1)  # Prevent repeated triggering
